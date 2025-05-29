@@ -13,6 +13,8 @@ public class Cancel extends JFrame implements ActionListener{
     JButton fetchUser, flight;
     
     public Cancel(){
+        
+        setTitle("Cancellation");
         getContentPane().setBackground(Color.WHITE);
         setLayout(null);
         
@@ -104,14 +106,14 @@ public class Cancel extends JFrame implements ActionListener{
             try {
             Conn conn = new Conn();
             
-            String query = "select * from reservation where PNR ='"+pnr+"'";
+            String query = "select * from reservations where PNR ='"+pnr+"'";
             
             ResultSet rs = conn.s.executeQuery(query);
             
            if (rs.next()){
                 tfname.setText(rs.getString("name"));
-                lblfcode.setText(rs.getString("flightcode"));
-                lbldateoftrvel.setText(rs.getString("ddate"));
+                lblfcode.setText(rs.getString("flight_code"));
+                lbldateoftrvel.setText(rs.getString("journey_date"));
             }  else {
                 JOptionPane.showMessageDialog(null, "Please enter correct PNR");
             }
@@ -125,19 +127,34 @@ public class Cancel extends JFrame implements ActionListener{
             String cancelno = cancellationno.getText();
             String fcode = lblfcode.getText();
             String date = lbldateoftrvel.getText();
+            
+            if (pnr.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "PNR field cannot be empty. Please enter a valid PNR.");
+            return; // exit the method without proceeding
+        }
+
         
-            try {
-            Conn conn = new Conn();
-            
-            String query = "insert into cancel values('"+pnr+"', '"+name+"', '"+cancelno+"', '"+fcode+"', '"+date+"')";
-            
+           try {
+           Conn conn = new Conn();
+    
+            // Insert into cancel table
+            String query = "INSERT INTO cancel (pnr, name, cancelno, fcode, ddate) " + "VALUES ('" + pnr + "', '" + name + "', '" + cancelno + "', '" + fcode + "', '" + date + "')";
             conn.s.executeUpdate(query);
-            conn.s.executeUpdate("delete from reservation where PNR = '"+pnr+"'");
-            
-            JOptionPane.showMessageDialog(null, "Ticket cancelled");
+
+            // Delete from reservations table
+            conn.s.executeUpdate("DELETE FROM reservations WHERE PNR = '" + pnr + "'");
+
+            // Delete from seat_selection table
+            conn.s.executeUpdate("DELETE FROM seat_selection WHERE PNR = '" + pnr + "'");
+
+            // Delete from payments table
+            conn.s.executeUpdate("DELETE FROM payments WHERE PNR = '" + pnr + "'");
+
+            JOptionPane.showMessageDialog(null, "Ticket cancelled successfully!\n70% of the amount of ticket will be refunded.\nPlease collect it from the office.");
             setVisible(false);
-        }catch (Exception e){
-            e.printStackTrace();
+        }      
+           catch (Exception e) {
+           e.printStackTrace();
         }
     }        
         }                                      

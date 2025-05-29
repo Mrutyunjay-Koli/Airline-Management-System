@@ -8,14 +8,15 @@ import java.sql.*;
 public class BoardingPass extends JFrame implements ActionListener{
     
     JTextField tfpnr;
-    JLabel tfname, tfnationailty, tfsrc, lbldest, labelfname, labelfcode, labeldate;
-    JButton fetchUser;
+    JLabel tfname, tfnationailty, tfsrc, lbldest, labelfname, labelfcode, labeldate, lblobday, lbltiming;
+    JButton fetchUser, printButton;
     
     public BoardingPass(){
+        
+        setTitle("Boarding Pass");
         getContentPane().setBackground(Color.WHITE);
         setLayout(null);
          
-
         JLabel heading = new JLabel("AIR INDIA");
         heading.setBounds(380, 10, 450, 35);
         heading.setFont(new Font("Tahoma", Font.PLAIN, 32));
@@ -61,8 +62,7 @@ public class BoardingPass extends JFrame implements ActionListener{
         tfnationailty.setBounds(220, 180, 150, 25);
         add(tfnationailty);
         
-        
-        JLabel lbladdress = new JLabel("SRC");
+        JLabel lbladdress = new JLabel("SOURCE");
         lbladdress.setBounds(60, 220, 150, 25);
         lbladdress.setFont(new Font("Tahoma", Font.PLAIN, 16));
         add(lbladdress);
@@ -71,7 +71,7 @@ public class BoardingPass extends JFrame implements ActionListener{
         tfsrc.setBounds(220, 220, 150, 25);
         add(tfsrc);
         
-        JLabel lblgender = new JLabel("DEST");
+        JLabel lblgender = new JLabel("DESTINATION");
         lblgender.setBounds(380, 215, 150, 25);
         lblgender.setFont(new Font("Tahoma", Font.PLAIN, 16));
         add(lblgender);
@@ -107,42 +107,80 @@ public class BoardingPass extends JFrame implements ActionListener{
         labeldate.setBounds(220, 300, 150, 25);
         add(labeldate);
         
+        // New Fields for Operating Days and Timing
+        JLabel lblopday = new JLabel("OPERATING DAY");
+        lblopday.setBounds(60, 340, 150, 25);
+        lblopday.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        add(lblopday);
+        
+        lblobday = new JLabel();
+        lblobday.setBounds(220, 340, 150, 25);
+        add(lblobday);
+        
+        JLabel lbltime = new JLabel("TIMING");
+        lbltime.setBounds(380, 340, 150, 25);
+        lbltime.setFont(new Font("Tahoma", Font.PLAIN, 16));
+        add(lbltime);
+        
+        lbltiming = new JLabel();
+        lbltiming.setBounds(540, 340, 150, 25);
+        add(lbltiming);
+        
         ImageIcon i1 = new ImageIcon(ClassLoader.getSystemResource("airlinemanagementsystem/icons/airindia.png"));
         Image i2 = i1.getImage().getScaledInstance(300, 230, Image.SCALE_DEFAULT);
         ImageIcon image = new ImageIcon(i2);
         JLabel lblimage = new JLabel(image);
         lblimage.setBounds(600, 0, 300, 300);
         add(lblimage);
-
-        setSize(950, 450);
+        
+        printButton = new JButton("Print");
+        printButton.setBounds(380, 390, 120, 30);
+        printButton.setBackground(Color.BLACK);
+        printButton.setForeground(Color.WHITE);
+        printButton.addActionListener(this);
+        add(printButton);
+        
+        setSize(950, 500);
         setLocation(200, 90);
         setVisible(true);
     }
     
     public void actionPerformed(ActionEvent ae){
-            String pnr = tfpnr.getText();
-            try {
+        String pnr = tfpnr.getText();
+        try {
             Conn conn = new Conn();
             
-            String query = "select * from reservation where PNR ='"+pnr+"'";
+            String query = "SELECT * FROM reservations WHERE PNR = '"+pnr+"'";
             
             ResultSet rs = conn.s.executeQuery(query);
 
             if (rs.next()){
                 tfname.setText(rs.getString("name"));
                 tfnationailty.setText(rs.getString("nationailty"));
-                tfsrc.setText(rs.getString("src"));
-                lbldest.setText(rs.getString("dest"));
-                labelfname.setText(rs.getString("flightname"));
-                labelfcode.setText(rs.getString("flightcode"));
-                labeldate.setText(rs.getString("ddate"));
+                tfsrc.setText(rs.getString("source"));
+                lbldest.setText(rs.getString("destination"));
+                labelfname.setText(rs.getString("flight_name"));
+                labelfcode.setText(rs.getString("flight_code"));
+                labeldate.setText(rs.getString("journey_date"));
+                lblobday.setText(rs.getString("Operating_Day")); // Fetching Operating Days
+                lbltiming.setText(rs.getString("Timing")); // Fetching Timing
             }  else {
-                JOptionPane.showMessageDialog(null, "Please enter correct PNR");
+                JOptionPane.showMessageDialog(null, "Please enter PNR");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-}
+        
+        if (ae.getSource() == printButton) {
+            if (!tfname.getText().isEmpty() && !tfnationailty.getText().isEmpty() && !tfsrc.getText().isEmpty() &&
+                !lbldest.getText().isEmpty() && !labelfname.getText().isEmpty() && !labelfcode.getText().isEmpty() &&
+                !labeldate.getText().isEmpty() && !lblobday.getText().isEmpty() && !lbltiming.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Print Successful");
+            } else {
+                JOptionPane.showMessageDialog(null, "All fields must be filled for Print");
+            }
+        }
+    }
     
     public static void main(String[] args) {
         new BoardingPass();

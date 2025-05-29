@@ -9,6 +9,7 @@ public class Home extends JFrame implements ActionListener{
     
     public Home(){
         
+        setTitle("Home");
         setLayout(null);
         
         ImageIcon i1 = new ImageIcon(ClassLoader.getSystemResource("airlinemanagementsystem/icons/front.jpg"));
@@ -55,8 +56,11 @@ public class Home extends JFrame implements ActionListener{
         JMenuItem boardingPass = new JMenuItem("Boarding Pass");
         boardingPass.addActionListener(this);
         ticket.add(boardingPass);
-
         
+        JMenuItem reportsystem = new JMenuItem("Reports");
+        reportsystem.addActionListener(this);
+        ticket.add(reportsystem);
+
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
     }
@@ -76,6 +80,9 @@ public class Home extends JFrame implements ActionListener{
            new Cancel();
        } else if(text.equals("Boarding Pass")){
             new BoardingPass();
+       }
+        else if(text.equals("Reports")){
+            new ReportsSystem();
        }
     } 
 
